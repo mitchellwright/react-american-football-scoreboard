@@ -1,5 +1,5 @@
 //TODO: STEP 1 - Import the useState hook.
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BottomRow from "./BottomRow";
 import ScoreBox from "./ScoreBox";
 import "./App.css";
@@ -9,6 +9,8 @@ function App() {
 
   let [homeScore, setHomeScore] = useState(0);
   let [awayScore, setAwayScore] = useState(0);
+  let [seconds, setSeconds] = useState(0);
+  let [minutes, setMinutes] = useState(0);
 
   const scoreHandler = (homeAwayTeam, scoreAmount) => {
     if(homeAwayTeam === 'home') {
@@ -18,12 +20,32 @@ function App() {
     }
   };
 
+  const pad = (num, size) => {
+    var s = `${num}`;
+    while (s.length < size) {
+      s = '0' + s;
+    }
+    return s;
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if(seconds === 59) {
+        setSeconds(0);
+        setMinutes(minutes => minutes + 1);
+      } else {
+        setSeconds(seconds => seconds + 1);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [seconds, minutes]);
+
   return (
     <div className="container">
       <section className="scoreboard">
         <div className="topRow">
           <ScoreBox homeAway="home" teamName="Lions" score={homeScore}/>
-          <div className="timer">00:03</div>
+          <div className="timer">{pad(minutes, 2)}:{pad(seconds, 2)}</div>
           <ScoreBox homeAway='away' teamName='Tigers' score={awayScore}/>
         </div>
         <BottomRow />
